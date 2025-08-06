@@ -1,0 +1,9 @@
+{% extends "_layouts/elementindex" %}
+
+{% set title = "Enabled Cookies"|t("dowley-cookieconsent") %}
+{% do view.registerAssetBundle("dowleydeveloped\\cookieconsent\\assets\\IndexAssets") %}
+{% set elementType = "dowleydeveloped\\cookieconsent\\elements\\CookieElement" %}
+
+{% do view.registerTranslations("app", [
+	"New Cookie",
+]) %}

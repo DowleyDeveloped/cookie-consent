@@ -1,0 +1,50 @@
+{% extends "_layouts/cp" %}
+{% set crumbs = [
+	{
+		label: "Settings"|t("app"),
+		url: url("settings")
+	}
+] %}
+
+{% set selectedSubnavItem = "settings" %}
+
+{% set navItems = {
+	"settings-heading": {
+		heading: "Settings"|t("dowley-cookieconsent")
+	},
+	general: {
+		title: "General"|t("dowley-cookieconsent")
+	},
+	google: {
+		title: "Google"|t("dowley-cookieconsent")
+	},
+	customisation: {
+		title: "Customisation"|t("dowley-cookieconsent")
+	},
+	colours: {
+		title: "Colours"|t("dowley-cookieconsent")
+	}
+} %}
+
+{% set activeTab = craft.app.request.getSegment(3) ?? "general" %}
+
+{% block sidebar %}
+	<nav>
+		<ul>
+			{% for key, element in navItems %}
+				{% if element.heading is defined %}
+					<li class="heading"><span>{{ element.heading }}</span></li>
+				{% else %}
+					<li>
+						<a
+							href="{{ url("cookie-consent/settings/" ~ key) }}"
+							{{ activeTab == key ? "class='sel'" }}
+						>
+							{{ element.title }}
+						</a>
+					</li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+	</nav>
+{% endblock %}

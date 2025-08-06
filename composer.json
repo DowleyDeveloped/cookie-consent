@@ -1,0 +1,41 @@
+{
+	"name": "dowleydeveloped/cookie-consent",
+	"description": "Craft CMS Plugin for managing cookies.",
+	"type": "craft-plugin",
+	"version": "1.0.0",
+	"license": "MIT",
+	"keywords": [
+		"craftcms",
+		"cookie-consent",
+		"cookie-management",
+		"gdpr",
+		"consent-mode",
+		"google-consent-mode",
+		"craftcms-plugin",
+		"privacy",
+		"user-consent"
+	],
+	"require": {
+		"craftcms/cms": "^5.0.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"dowleydeveloped\\cookieconsent\\": "src/"
+		}
+	},
+	"extra": {
+		"name": "Cookie Consent",
+		"handle": "dowley-cookieconsent",
+		"developer": "DowleyDeveloped",
+		"developerUrl": "https://charlottedowley.co.uk",
+		"documentationUrl": "https://github.com/dowleydeveloped/cookie-consent/blob/main/README.md",
+		"changelogUrl": "https://raw.githubusercontent.com/dowleydeveloped/cookie-consent/main/CHANGELOG.md",
+		"class": "dowleydeveloped\\cookieconsent\\CookieConsent"
+	},
+	"config": {
+		"allow-plugins": {
+			"yiisoft/yii2-composer": true,
+			"craftcms/plugin-installer": true
+		}
+	}
+}
