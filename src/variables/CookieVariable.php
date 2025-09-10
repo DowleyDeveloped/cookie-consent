@@ -55,4 +55,14 @@ class CookieVariable extends ServiceLocator
 		return $options;
 	}
 	
+	public function getContent()
+	{
+		$row = (new Query())
+			->select(['*'])
+			->from('{{%dowley_cookies_content}}')
+			->one();
+		
+		return $row;
+	}
+	
 }

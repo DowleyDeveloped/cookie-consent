@@ -106,6 +106,10 @@ class CookieConsent extends Plugin
                     "label" => "Cookies",
                     "url" => "cookie-consent/cookies",
                 ],
+                "content" => [
+                    "label" => "Content",
+                    "url" => "cookie-consent/content",
+                ],
                 "guide" => [
                     "label" => "Guide",
                     "url" => "cookie-consent/guide",
@@ -146,8 +150,6 @@ class CookieConsent extends Plugin
                         "dowley-cookieconsent/settings/general", // Controller
                     "cookie-consent/settings/google" =>
                         "dowley-cookieconsent/settings/google", // Controller
-                    "cookie-consent/settings/customisation" =>
-                        "dowley-cookieconsent/settings/customisation", // Controller
                     "cookie-consent/settings/colours" =>
                         "dowley-cookieconsent/settings/colours", // Controller
                     "cookie-consent" => [
@@ -162,6 +164,9 @@ class CookieConsent extends Plugin
                     "cookie-consent/guide" => [
                         "template" => "dowley-cookieconsent/guide", // Template
                     ],
+                    "cookie-consent/content" => [
+                        "template" => "dowley-cookieconsent/content", // Template
+                    ]
                 ];
 
                 $event->rules = array_merge($event->rules, $routes);
