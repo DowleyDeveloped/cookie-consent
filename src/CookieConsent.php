@@ -4,6 +4,7 @@ namespace dowleydeveloped\cookieconsent;
 /* Craft */
 use Craft;
 use craft\base\Plugin;
+use craft\elements\Entry as EntryElement;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\PluginEvent;
@@ -25,6 +26,9 @@ use dowleydeveloped\cookieconsent\records\LogRecord;
 use dowleydeveloped\cookieconsent\twigextensions\CookieExtension;
 use dowleydeveloped\cookieconsent\variables\CookieVariable;
 
+// Website Documentation
+use dowleydeveloped\websitedocumentation\WebsiteDocumentation;
+
 /* Yii */
 use yii\base\Application;
 use yii\base\Event;
@@ -38,276 +42,253 @@ use Psr\Log\LogLevel;
 
 /**
  * @author    DowleyDeveloped
- * @package   Cookie Consent
  * @since     1.0.0
  *
  */
 class CookieConsent extends Plugin
 {
-    public static string $plugin;
-    public ?string $name = "Cookie Consent";
-    public static ?CookieVariable $cookieVariable;
-    public static ?SettingsModel $settings;
+	public static string $plugin;
+	public ?string $name = "Cookie Consent";
+	public static ?CookieVariable $cookieVariable;
+	public static ?SettingsModel $settings;
 
-    public function init(): void
-    {
-        $this->hasCpSection = true;
-        $this->hasCpSettings = true;
-        self::$settings = $this->getSettings();
-        self::$cookieVariable = new CookieVariable();
+	public function init() : void {
+		$this->hasCpSection = true;
+		$this->hasCpSettings = true;
+		self::$settings = $this->getSettings();
+		self::$cookieVariable = new CookieVariable();
 
-        // Create Custom Alias
-        Craft::setAlias("@dowleycookieconsent", __DIR__);
+		// Create Custom Alias
+		Craft::setAlias('@dowleycookieconsent', __DIR__);
 
-        parent::init();
+		parent::init();
 
-        $this->setRoutes();
-        $this->registerElement();
-        $this->registerFields();
-        $this->_setEvents();
-        $this->_afterInstall();
-        $this->_registerTwigExtensions();
-    }
+		$this->setRoutes();
+		$this->registerElement();
+		$this->registerFields();
+		$this->_setEvents();
+		$this->_registerTwigExtensions();
+	}
 
-    // Public Functions
-    // _______________________________________
+	// Public Functions
+	// _______________________________________
 
-    /**
-     * @return mixed
-     */
-    public function getSettingsResponse(): mixed
-    {
-        return Craft::$app->controller->redirect(
-            UrlHelper::cpUrl("cookie-consent/settings/general")
-        );
-    }
+	/**
+	 * @return mixed
+	 */
+	public function getSettingsResponse(): mixed {
+		return Craft::$app->controller->redirect(UrlHelper::cpUrl("cookie-consent/settings/general"));
+	}
 
-    // Rename the Control Panel Item & Add Sub Menu
-    public function getCpNavItem(): ?array
-    {
-        // Create main navigation item
-        $item = [
-            "label" => "Cookie Consent",
-            "url" => "cookie-consent",
-            "icon" => "@dowleycookieconsent/icons/cookie.svg",
-        ];
+	// Rename the Control Panel Item & Add Sub Menu
+	public function getCpNavItem(): ?array
+	{
+		// Create main navigation item
+		$item = [
+			"label" => "Cookie Consent",
+			"url" =>  "cookie-consent",
+			"icon" => "@dowleycookieconsent/icons/cookie.svg",
+		];
 
-        // Get Settings
-        $settings = $this->getSettings();
+		// Get Settings
+		$settings = $this->getSettings();
 
-        // Add Sub Navigation items
-        $item = array_merge($item, [
-            "subnav" => [
-                "dashboard" => [
-                    "label" => "Dashboard",
-                    "url" => "cookie-consent/dashboard",
-                ],
-                "cookies" => [
-                    "label" => "Cookies",
-                    "url" => "cookie-consent/cookies",
-                ],
-                "content" => [
-                    "label" => "Content",
-                    "url" => "cookie-consent/content",
-                ],
-                "guide" => [
-                    "label" => "Guide",
-                    "url" => "cookie-consent/guide",
-                ],
-            ],
-        ]);
+		// Add Sub Navigation items
+		$item = array_merge($item, [
+			"subnav" => [
+				"dashboard" => [
+					"label" => "Dashboard",
+					"url" => "cookie-consent/dashboard",
+				],
+				"cookies" => [
+					"label" => "Cookies",
+					"url" => "cookie-consent/cookies",
+				],
+				"content" => [
+					"label" => "Content",
+					"url" => "cookie-consent/content",
+				],
+				"guide" => [
+					"label" => "Guide",
+					"url" => "cookie-consent/guide",
+				],
+			],
+		]);
 
-        // If changes are allowed, we can show the settings. These will be saved in the project config
-        $editableSettings = true;
-        $general = Craft::$app->getConfig()->getGeneral();
-        if (!$general->allowAdminChanges) {
-            $editableSettings = false;
-        }
+		// If changes are allowed, we can show the settings. These will be saved in the project config
+		$editableSettings = true;
+		$general = Craft::$app->getConfig()->getGeneral();
+		if (!$general->allowAdminChanges) {
+			$editableSettings = false;
+		}
 
-        if ($editableSettings) {
-            $item["subnav"]["settings"] = [
-                "label" => "Settings",
-                "url" => "cookie-consent/settings",
-            ];
-        }
+		if ($editableSettings) {
+			$item["subnav"]["settings"] = [
+				"label" => "Settings",
+				"url" => "cookie-consent/settings"
+			];
+		}
 
-        return $item;
-    }
+		return $item;
+	}
 
-    // Protected Functions
-    // _______________________________________
+	// Protected Functions
+	// _______________________________________
 
-    protected function setRoutes(): void
-    {
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $routes = [
-                    "cookie-consent/settings" =>
-                        "dowley-cookieconsent/settings/general", // Controller
-                    "cookie-consent/settings/general" =>
-                        "dowley-cookieconsent/settings/general", // Controller
-                    "cookie-consent/settings/google" =>
-                        "dowley-cookieconsent/settings/google", // Controller
-                    "cookie-consent/settings/colours" =>
-                        "dowley-cookieconsent/settings/colours", // Controller
-                    "cookie-consent" => [
-                        "template" => "dowley-cookieconsent/dashboard", // Template
-                    ],
-                    "cookie-consent/dashboard" => [
-                        "template" => "dowley-cookieconsent/dashboard", // Template
-                    ],
-                    "cookie-consent/cookies" =>
-                        "dowley-cookieconsent/cookies/index", // Controller
-                    "cookie-consent/cookies/<elementId:\d+>" => "elements/edit", // Craft
-                    "cookie-consent/guide" => [
-                        "template" => "dowley-cookieconsent/guide", // Template
-                    ],
-                    "cookie-consent/content" => [
-                        "template" => "dowley-cookieconsent/content", // Template
-                    ]
-                ];
+	protected function setRoutes() : void {
+		Event::on(
+			UrlManager::class,
+			UrlManager::EVENT_REGISTER_CP_URL_RULES,
+			function (RegisterUrlRulesEvent $event) {
 
-                $event->rules = array_merge($event->rules, $routes);
-            }
-        );
-    }
+				$routes = [
+					"cookie-consent/settings" => "dowley-cookieconsent/settings/general", // Controller
+					"cookie-consent/settings/general" => "dowley-cookieconsent/settings/general", // Controller
+					"cookie-consent/settings/exclude" => "dowley-cookieconsent/settings/exclude", // Controller
+					"cookie-consent/settings/google" => "dowley-cookieconsent/settings/google", // Controller
+					"cookie-consent/settings/colours" => "dowley-cookieconsent/settings/colours", // Controller
+					"cookie-consent" => [
+						"template" => "dowley-cookieconsent/dashboard", // Template
+					],
+					"cookie-consent/dashboard" => [
+						"template" => "dowley-cookieconsent/dashboard", // Template
+					],
+					"cookie-consent/cookies" => "dowley-cookieconsent/cookies/index", // Controller
+					"cookie-consent/cookies/<elementId:\d+>" => "elements/edit", // Craft
+					"cookie-consent/guide" => [
+						"template" => "dowley-cookieconsent/guide", // Template
+					],
+					"cookie-consent/content" => [
+						"template" => "dowley-cookieconsent/content", // Template
+					],
+				];
 
-    protected function createSettingsModel(): SettingsModel
-    {
-        return new SettingsModel();
-    }
+				$event->rules = array_merge($event->rules, $routes);
+			}
+		);
+	}
 
-    protected function registerElement()
-    {
-        Event::on(
-            Elements::class,
-            Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function (RegisterComponentTypesEvent $event) {
-                $event->types[] = CookieElement::class;
-                $event->types[] = LogElement::class;
-            }
-        );
-    }
+	protected function createSettingsModel(): SettingsModel {
+		return new SettingsModel();
+	}
 
-    protected function registerFields()
-    {
-        Event::on(
-            FieldLayout::class,
-            FieldLayout::EVENT_DEFINE_NATIVE_FIELDS,
-            static function (DefineFieldLayoutFieldsEvent $event): void {
-                CookieElement::defineNativeFields($event);
-            }
-        );
-    }
+	protected function registerElement() {
+		Event::on(
+			Elements::class,
+			Elements::EVENT_REGISTER_ELEMENT_TYPES,
+			function(RegisterComponentTypesEvent $event) {
+				$event->types[] = CookieElement::class;
+				$event->types[] = LogElement::class;
+			}
+		);
+	}
 
-    /**
-     * @return string|null
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \yii\base\Exception
-     */
-    protected function settingsHtml(): ?string
-    {
-        return \Craft::$app
-            ->getView()
-            ->renderTemplate("cookie-consent/settings", [
-                "settings" => $this->getSettings(),
-            ]);
-    }
+	protected function registerFields() {
+		Event::on(
+			FieldLayout::class,
+			FieldLayout::EVENT_DEFINE_NATIVE_FIELDS,
+			static function(DefineFieldLayoutFieldsEvent $event): void {
+				CookieElement::defineNativeFields($event);
+			}
+		);
+	}
 
-    // Private Functions
-    // _______________________________________
+	/**
+	 * @return string|null
+	 * @throws \Twig\Error\LoaderError
+	 * @throws \Twig\Error\RuntimeError
+	 * @throws \Twig\Error\SyntaxError
+	 * @throws \yii\base\Exception
+	 */
+	protected function settingsHtml(): ?string {
+		return \Craft::$app->getView()->renderTemplate(
+			"cookie-consent/settings",
+			[ "settings" => $this->getSettings() ]
+		);
+	}
 
-    private function _setEvents(): void
-    {
-        /** @var $settings SettingsModel */
-        $settings = $this->getSettings();
+	// Private Functions
+	// _______________________________________
 
-        if (
-            Craft::$app->getRequest()->getIsSiteRequest() &&
-            $settings->isEnabled()
-        ) {
-            Event::on(View::class, View::EVENT_BEGIN_BODY, function (
-                Event $event
-            ) {
-                $view = Craft::$app->getView();
+	private function _setEvents() : void {
+		/** @var $settings SettingsModel */
+		$settings = $this->getSettings();
+		$self = $this;
 
-                // Switch to the plugin templates
-                $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+		if(
+			Craft::$app->getRequest()->getIsSiteRequest() &&
+			$settings->isEnabled()
+		) {
+			Event::on(
+				View::class,
+				View::EVENT_BEGIN_BODY,
+				function(Event $event) use ($settings, $self) {
+					$view = Craft::$app->getView();
 
-                // Add Variables
-                $variables = $view->renderTemplate(
-                    "dowley-cookieconsent/_variables.twig"
-                );
+					// Check the entry
+					$element = Craft::$app->getUrlManager()->getMatchedElement();
 
-                //minify
-                $variables = preg_replace("/\s+/", " ", $variables);
-                $variables = str_replace(
-                    [" >", "< ", " ,"],
-                    [">", "<", ","],
-                    $variables
-                );
+					if ($element instanceof EntryElement) {
+						if (in_array((string) $element->id, $settings->excludeIds, true)) {
+							return;
+						}
+					}
 
-                $view->registerJs($variables, View::POS_HEAD);
+					// Check we've got website documentation plugin installed
+					$websitedocs = Craft::$app->plugins->getPlugin('websitedocumentation');
+					$websitedocsUrl = null;
 
-                // Load the JS file
-                $bundle = Craft::$app
-                    ->getView()
-                    ->registerAssetBundle(CookieAssets::class);
+					if ($websitedocs) {
+						$handle = Craft::$app->sites->currentSite->handle ?? "default";
+						$config = WebsiteDocumentation::customConfig();
+						$websitedocsUrl = WebsiteDocumentation::$plugin->getDocUrl($config, $handle);
+					}
 
-                $jsFile = $bundle->baseUrl . "/dist/js/main.js";
+					if ($websitedocsUrl) {
+						$currentUrl = Craft::$app->getRequest()->getAbsoluteUrl();
+						if (strpos($currentUrl, $websitedocsUrl) !== false) {
+							return;
+						}
+					}
 
-                $view->registerJsFile($jsFile, [
-                    "position" => YiiView::POS_END,
-                    "defer" => true,
-                    "type" => "module",
-                ]);
+					// Switch to the plugin templates
+					$view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-                // Switch back to front end
-                $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
-            });
-        }
-    }
+					// Add Variables
+					$variables = $view->renderTemplate('dowley-cookieconsent/_variables.twig');
 
-    /**
-     * Registers Twig extensions.
-     */
-    private function _registerTwigExtensions()
-    {
-        Craft::$app->view->registerTwigExtension(new CookieExtension());
-    }
+					//minify
+					$variables = preg_replace('/\s+/', ' ', $variables);
+					$variables = str_replace([' >', '< ', ' ,'], ['>', '<', ','], $variables);
 
-    /**
-     * @title: After Install
-     * @desc: Add the default row to the dowley_cookies_tracked table
-     */
-    private function _afterInstall()
-    {
-        Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            function (PluginEvent $event) {
-                if ($event->plugin === $this) {
-                    // Create new Log Element
-                    $element = new LogElement();
+					$view->registerJs($variables, View::POS_HEAD);
 
-                    if (
-                        !Craft::$app->getElements()->saveElement($element, true)
-                    ) {
-                        return $this->asModelFailure(
-                            $element,
-                            Craft::t(
-                                "dowley-cookieconsent",
-                                "Couldn’t add Element."
-                            ),
-                            "element"
-                        );
-                    }
-                }
-            }
-        );
-    }
+					// Load the JS file
+					$bundle = Craft::$app->getView()->registerAssetBundle(CookieAssets::class);
+
+					$jsFile = $bundle->baseUrl . '/dist/js/main.js';
+
+					$view->registerJsFile(
+						$jsFile,
+						[
+							'position' => YiiView::POS_END,
+							'defer' => true,
+							'type' => 'module',
+						]
+					);
+
+					// Switch back to front end
+					$view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+				}
+			);
+		}
+	}
+
+	/**
+	 * Registers Twig extensions.
+	 */
+	private function _registerTwigExtensions()
+	{
+		Craft::$app->view->registerTwigExtension(new CookieExtension());
+	}
 }

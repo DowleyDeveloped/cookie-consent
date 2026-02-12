@@ -3,18 +3,21 @@ namespace dowleydeveloped\cookieconsent\migrations;
 
 use Craft;
 use craft\db\Migration;
-use craft\db\Table;
 use craft\helpers\MigrationHelper;
 
+/**
+ * Install migration for Cookie Consent.
+ *
+ * NOTE:
+ * - These tables are NOT element-backed, so they must NOT FK to craft_elements.
+ * - Uses normal primary keys (auto-increment) and inserts default rows.
+ */
 class Install extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     public function safeUp(): bool
     {
         $this->createTables();
-        $this->addForeignKeys();
+        $this->createIndexes();
 
         return true;
     }
@@ -22,40 +25,63 @@ class Install extends Migration
     public function safeDown(): bool
     {
         $this->dropProjectConfig();
-        $this->dropForeignKeys();
         $this->dropTables();
 
         return true;
     }
 
-    public function createTables(): void
+    private function createTables(): void
     {
-        // User Clicks
-        $this->archiveTableIfExists('{{%dowley_cookies_tracked}}');
-        $this->createTable('{{%dowley_cookies_tracked}}', [
-            'id' => $this->primaryKey(),
+        /**
+         * Tracked totals (single-row counter table)
+         */
+        $trackedTable = '{{%dowley_cookies_tracked}}';
+        $this->archiveTableIfExists($trackedTable);
+
+        $this->createTable($trackedTable, [
+            'id' => $this->primaryKey(), // normal auto-increment PK (NOT element id)
             'accepted' => $this->integer()->notNull()->defaultValue(0),
             'rejected' => $this->integer()->notNull()->defaultValue(0),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
         ]);
 
-        // Cookies
-        $this->archiveTableIfExists('{{%dowley_cookies_enabled}}');
-        $this->createTable('{{%dowley_cookies_enabled}}', [
-            'id' => $this->primaryKey(),
+        // Insert a single default row
+        $this->insert($trackedTable, [
+            'accepted' => 0,
+            'rejected' => 0,
+            'dateCreated' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'dateUpdated' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'uid' => Craft::$app->getSecurity()->generateRandomString(36),
+        ]);
+
+        /**
+         * Enabled cookies list
+         */
+        $enabledTable = '{{%dowley_cookies_enabled}}';
+        $this->archiveTableIfExists($enabledTable);
+
+        $this->createTable($enabledTable, [
+            'id' => $this->primaryKey(), // normal auto-increment PK (NOT element id)
             'type' => $this->string(255),
             'cookieId' => $this->string(255),
             'domain' => $this->string(255),
             'duration' => $this->string(255),
             'description' => $this->text(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
         ]);
 
-        // Content
+        /**
+         * Popup / preferences content (single-row config table)
+         */
         $contentTable = '{{%dowley_cookies_content}}';
         $this->archiveTableIfExists($contentTable);
 
-        // Create the New Table
         $this->createTable($contentTable, [
-            'id' => $this->primaryKey(),
+            'id' => $this->primaryKey(), // normal auto-increment PK
             'popupTitle' => $this->text()->null(),
             'popupDescription' => $this->text()->null(),
             'popupFooter' => $this->text()->null(),
@@ -73,9 +99,13 @@ class Install extends Migration
             'preferencesPosition' => $this->string(255)->defaultValue('right'),
             'triggerIcon' => $this->integer(),
             'triggerPosition' => $this->string(255)->defaultValue('left'),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
         ]);
 
-        // Update Values
+        // Insert a single default row
+        $now = (new \DateTime())->format('Y-m-d H:i:s');
         $this->insert($contentTable, [
             'popupTitle' => 'We value your privacy',
             'popupDescription' => "We use cookies to enhance your browsing experience, serve personalised ads or content, and analyse our traffic. By clicking 'Accept', you consent to our use of cookies.",
@@ -88,33 +118,28 @@ class Install extends Migration
             'performanceCookies' => 'Performance cookies are used to understand and analyse the key performance indexes of the website which helps in delivering a better user experience for the visitors.',
             'advertisingCookies' => 'Advertisement cookies are used to provide visitors with customised advertisements based on the pages you visited previously and to analyse the effectiveness of the ad campaigns.',
             'securityCookies' => 'Cookies used for security authenticate users, prevent fraud, and protect users as they interact with a service.',
+            'dateCreated' => $now,
+            'dateUpdated' => $now,
+            'uid' => Craft::$app->getSecurity()->generateRandomString(36),
         ]);
     }
 
-    public function addForeignKeys(): void
+    private function createIndexes(): void
     {
-        $this->addForeignKey(null, '{{%dowley_cookies_tracked}}', ['id'], Table::ELEMENTS, ['id'], 'CASCADE', null);
-        $this->addForeignKey(null, '{{%dowley_cookies_enabled}}', ['id'], Table::ELEMENTS, ['id'], 'CASCADE', null);
+        // Helpful indexes (optional but good)
+        $this->createIndex(null, '{{%dowley_cookies_enabled}}', ['cookieId'], false);
+        $this->createIndex(null, '{{%dowley_cookies_enabled}}', ['type'], false);
+        $this->createIndex(null, '{{%dowley_cookies_enabled}}', ['domain'], false);
     }
 
-    public function dropTables(): void
+    private function dropTables(): void
     {
-        $this->dropTableIfExists('{{%dowley_cookies_tracked}}');
+        $this->dropTableIfExists('{{%dowley_cookies_content}}');
         $this->dropTableIfExists('{{%dowley_cookies_enabled}}');
+        $this->dropTableIfExists('{{%dowley_cookies_tracked}}');
     }
 
-    public function dropForeignKeys(): void
-    {
-        if ($this->db->tableExists('{{%dowley_cookies_tracked}}')) {
-            MigrationHelper::dropAllForeignKeysOnTable('{{%dowley_cookies_tracked}}', $this);
-        }
-
-        if ($this->db->tableExists('{{%dowley_cookies_enabled}}')) {
-            MigrationHelper::dropAllForeignKeysOnTable('{{%dowley_cookies_enabled}}', $this);
-        }
-    }
-
-    public function dropProjectConfig(): void
+    private function dropProjectConfig(): void
     {
         Craft::$app->getProjectConfig()->remove('dowley-cookieconsent');
     }
