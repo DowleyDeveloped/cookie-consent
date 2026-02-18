@@ -85,6 +85,7 @@ class CookieConsent extends Plugin
 	{
 		$nav = parent::getCpNavItem();
         $nav['label'] = "Cookie Consent";
+		$nav['url'] = 'cookie-consent';
 		$nav['icon'] = "@dowleycookieconsent/icons/cookie.svg";
 
 		// Add SubMenus
@@ -132,11 +133,8 @@ class CookieConsent extends Plugin
 					"cookie-consent/settings/exclude" => "dowley-cookieconsent/settings/exclude", // Controller
 					"cookie-consent/settings/google" => "dowley-cookieconsent/settings/google", // Controller
 					"cookie-consent/settings/colours" => "dowley-cookieconsent/settings/colours", // Controller
-					"dowley-cookieconsent" => [
-						"template" => "dowley-cookieconsent/index", // Template
-					],
 					"cookie-consent" => [
-						"template" => "dowley-cookieconsent/index", // Template
+						"template" => "dowley-cookieconsent/dashboard", // Template
 					],
 					"cookie-consent/dashboard" => [
 						"template" => "dowley-cookieconsent/dashboard", // Template
