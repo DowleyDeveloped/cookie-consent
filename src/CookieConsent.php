@@ -83,53 +83,38 @@ class CookieConsent extends Plugin
 	// Rename the Control Panel Item & Add Sub Menu
 	public function getCpNavItem(): ?array
 	{
-		// Create main navigation item
-		$item = [
-			"label" => "Cookie Consent",
-			"url" =>  "cookie-consent",
-			"icon" => "@dowleycookieconsent/icons/cookie.svg",
-		];
+		$nav = parent::getCpNavItem();
+        $nav['label'] = "Cookie Consent";
+		$nav['icon'] = "@dowleycookieconsent/icons/cookie.svg";
 
-		// Get Settings
-		$settings = $this->getSettings();
-
-		// Add Sub Navigation items
-		$item = array_merge($item, [
-			"subnav" => [
-				"dashboard" => [
-					"label" => "Dashboard",
-					"url" => "cookie-consent/dashboard",
-				],
-				"cookies" => [
-					"label" => "Cookies",
-					"url" => "cookie-consent/cookies",
-				],
-				"content" => [
-					"label" => "Content",
-					"url" => "cookie-consent/content",
-				],
-				"guide" => [
-					"label" => "Guide",
-					"url" => "cookie-consent/guide",
-				],
+		// Add SubMenus
+		$nav['subnav'] = [
+			'dashboard' => [
+				'label' => "Dashboard",
+				'url' => 'cookie-consent/dashboard',
 			],
-		]);
+			'cookies' => [
+				'label' => "Cookies",
+				'url' => 'cookie-consent/cookies',
+			],
+			"content" => [
+				"label" => "Content",
+				"url" => "cookie-consent/content",
+			],
+			"guide" => [
+				"label" => "Guide",
+				"url" => "cookie-consent/guide",
+			],
+        ];
 
-		// If changes are allowed, we can show the settings. These will be saved in the project config
-		$editableSettings = true;
-		$general = Craft::$app->getConfig()->getGeneral();
-		if (!$general->allowAdminChanges) {
-			$editableSettings = false;
-		}
+        if (Craft::$app->getConfig()->getGeneral()->allowAdminChanges) {
+            $nav['subnav']['settings'] = [
+                'label' => "Settings",
+                'url' => 'cookie-consent/settings',
+            ];
+        }
 
-		if ($editableSettings) {
-			$item["subnav"]["settings"] = [
-				"label" => "Settings",
-				"url" => "cookie-consent/settings"
-			];
-		}
-
-		return $item;
+        return $nav;
 	}
 
 	// Protected Functions
@@ -147,8 +132,11 @@ class CookieConsent extends Plugin
 					"cookie-consent/settings/exclude" => "dowley-cookieconsent/settings/exclude", // Controller
 					"cookie-consent/settings/google" => "dowley-cookieconsent/settings/google", // Controller
 					"cookie-consent/settings/colours" => "dowley-cookieconsent/settings/colours", // Controller
+					"dowley-cookieconsent" => [
+						"template" => "dowley-cookieconsent/index", // Template
+					],
 					"cookie-consent" => [
-						"template" => "dowley-cookieconsent/dashboard", // Template
+						"template" => "dowley-cookieconsent/index", // Template
 					],
 					"cookie-consent/dashboard" => [
 						"template" => "dowley-cookieconsent/dashboard", // Template
