@@ -3,15 +3,18 @@ namespace dowleydeveloped\cookieconsent\migrations;
 
 use Craft;
 use craft\db\Migration;
-use craft\db\Table;
 use craft\helpers\MigrationHelper;
 use dowleydeveloped\cookieconsent\services\KnownCookies;
 
+/**
+ * Install migration for Cookie Consent.
+ *
+ * NOTE:
+ * - These tables are NOT element-backed, so they must NOT FK to craft_elements.
+ * - Uses normal primary keys (auto-increment) and inserts default rows.
+ */
 class Install extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     public function safeUp(): bool
     {
         $this->createTables();
@@ -28,7 +31,7 @@ class Install extends Migration
         return true;
     }
 
-    public function createTables(): void
+    private function createTables(): void
     {
 		// User Clicks
 		$this->archiveTableIfExists('{{%forty_cookies_tracked}}');
@@ -97,7 +100,7 @@ class Install extends Migration
 		]);
     }
 
-    public function dropTables(): void
+    private function dropTables(): void
     {
         $this->dropTableIfExists('{{%forty_cookies_tracked}}');
         $this->dropTableIfExists('{{%forty_cookies_enabled}}');

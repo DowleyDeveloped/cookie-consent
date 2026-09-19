@@ -42,7 +42,6 @@ use Psr\Log\LogLevel;
 
 /**
  * @author    DowleyDeveloped
- * @package   StagingWarning
  * @since     1.0.0
  *
  */

@@ -11,6 +11,9 @@ class SettingsModel extends Model {
 	// Entries
 	public array $excludeIds = [];
 
+	// Entries
+	public array $excludeIds = [];
+
 	// Text
 	// ______________________________________
 
