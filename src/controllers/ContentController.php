@@ -25,7 +25,7 @@ class ContentController extends Controller
 		$this->requirePostRequest();
 
 		$params = Craft::$app->getRequest()->getBodyParams();
-		$tableName = '{{%dowley_cookies_content}}';
+		$tableName = '{{%forty_cookies_content}}';
 
 		$row = (new Query())
 			->select(['*'])

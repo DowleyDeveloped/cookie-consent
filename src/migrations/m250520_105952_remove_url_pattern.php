@@ -15,7 +15,7 @@ class m250520_105952_remove_url_pattern extends Migration
      */
     public function safeUp(): bool
     {
-        $tableName = '{{%dowley_cookies_enabled}}'; // Note: use table prefix syntax
+        $tableName = '{{%forty_cookies_enabled}}'; // Note: use table prefix syntax
 
 		if ($this->db->tableExists($tableName)) {
 

@@ -1,6 +1,6 @@
 <template>
 	<button
-		id="dowley-cookie-modal-button"
+		id="forty-cookie-modal-button"
 		class="hidden"
 		:class="triggerClass"
 		type="button"
@@ -22,7 +22,12 @@
 import CookieIcon from "./resources/CookieIcon.vue";
 
 export default {
-	props: ["colours", "consentMode", "icon", "triggerPosition"],
+	props: [
+		"colours",
+		"consentMode",
+		"icon",
+		"triggerPosition",
+	],
 	components: {
 		CookieIcon,
 	},
@@ -42,88 +47,46 @@ export default {
 	computed: {
 		customIcon() {
 			if (!this.icon) {
-				return null;
+				return null
 			} else {
 				return this.icon;
 			}
 		},
 		triggerClass() {
 			return this.triggerPosition;
-		},
+		}
 	},
 	methods: {
 		updatePopupColors() {
 			const root = document.documentElement;
 			root.style.setProperty("--cc-bg", this.popup.backgroundColour);
 			root.style.setProperty("--cc-primary-color", this.popup.textColour);
-			root.style.setProperty(
-				"--cc-separator-border-color",
-				this.popup.textColour,
-			);
-			root.style.setProperty(
-				"--cc-secondary-color",
-				this.popup.textColour,
-			);
+			root.style.setProperty("--cc-separator-border-color", this.popup.textColour);
+			root.style.setProperty("--cc-secondary-color", this.popup.textColour);
 
-			root.style.setProperty(
-				"--cc-btn-primary-bg",
-				this.popup.buttonBackground,
-			);
-			root.style.setProperty(
-				"--cc-btn-primary-hover-bg",
-				this.popup.hoverButtonBackground,
-			);
-			root.style.setProperty(
-				"--cc-btn-primary-color",
-				this.popup.buttonText,
-			);
-			root.style.setProperty(
-				"--cc-btn-primary-hover-color",
-				this.popup.hoverButtonText,
-			);
+			root.style.setProperty("--cc-btn-primary-bg", this.popup.buttonBackground);
+			root.style.setProperty("--cc-btn-primary-hover-bg", this.popup.hoverButtonBackground);
+			root.style.setProperty("--cc-btn-primary-color", this.popup.buttonText);
+			root.style.setProperty("--cc-btn-primary-hover-color", this.popup.hoverButtonText);
 
-			root.style.setProperty(
-				"--cc-btn-secondary-bg",
-				this.popup.manageBackground,
-			);
+			root.style.setProperty("--cc-btn-secondary-bg", this.popup.manageBackground);
 			root.style.setProperty(
 				"--cc-btn-secondary-hover-border-color",
 				this.popup.hoverManageBackground,
 			);
-			root.style.setProperty(
-				"--cc-btn-secondary-hover-bg",
-				this.popup.hoverManageBackground,
-			);
+			root.style.setProperty("--cc-btn-secondary-hover-bg", this.popup.hoverManageBackground);
 
-			root.style.setProperty(
-				"--cc-btn-secondary-color",
-				this.popup.manageText,
-			);
-			root.style.setProperty(
-				"--cc-btn-secondary-hover-color",
-				this.popup.hoverManageText,
-			);
+			root.style.setProperty("--cc-btn-secondary-color", this.popup.manageText);
+			root.style.setProperty("--cc-btn-secondary-hover-color", this.popup.hoverManageText);
 
-			root.style.setProperty(
-				"--cc-footer-bg",
-				this.popup.footerBackground,
-			);
-			root.style.setProperty(
-				"--cc-footer-border-color",
-				this.popup.footerBackground,
-			);
+			root.style.setProperty("--cc-footer-bg", this.popup.footerBackground);
+			root.style.setProperty("--cc-footer-border-color", this.popup.footerBackground);
 			root.style.setProperty("--cc-footer-color", this.popup.footerText);
-			root.style.setProperty(
-				"--cc-footer-hover-color",
-				this.popup.hoverFooterText,
-			);
+			root.style.setProperty("--cc-footer-hover-color", this.popup.hoverFooterText);
 		},
 		updateModalColors() {
 			const root = document.documentElement;
-			root.style.setProperty(
-				"--cc-cookie-category-block-bg",
-				this.modal.toggleBackground,
-			);
+			root.style.setProperty("--cc-cookie-category-block-bg", this.modal.toggleBackground);
 			root.style.setProperty(
 				"--cc-cookie-category-block-border",
 				this.modal.toggleBackground,
@@ -136,10 +99,7 @@ export default {
 				"--cc-cookie-category-block-hover-border",
 				this.modal.hoverToggleBackground,
 			);
-			root.style.setProperty(
-				"--cc-cookie-category-block-text",
-				this.modal.toggleText,
-			);
+			root.style.setProperty("--cc-cookie-category-block-text", this.modal.toggleText);
 			root.style.setProperty(
 				"--cc-cookie-category-block-hover-text",
 				this.modal.hoverToggleText,
@@ -150,6 +110,7 @@ export default {
 </script>
 
 <style>
+
 #cc-main .pm__section--toggle {
 	.pm__section-title {
 		color: var(--cc-cookie-category-block-text);
@@ -169,7 +130,7 @@ export default {
 	}
 }
 
-#dowley-cookie-modal-button {
+#forty-cookie-modal-button {
 	position: fixed;
 	bottom: 1rem;
 	width: 2.813rem;
@@ -189,13 +150,14 @@ export default {
 	&.right {
 		right: 1rem;
 	}
+
 }
 
-#dowley-cookie-modal-button.hidden {
+#forty-cookie-modal-button.hidden {
 	display: none;
 }
 
-#dowley-cookie-modal-button svg {
+#forty-cookie-modal-button svg {
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
@@ -205,5 +167,6 @@ export default {
 	polygon {
 		fill: currentColor;
 	}
+
 }
 </style>

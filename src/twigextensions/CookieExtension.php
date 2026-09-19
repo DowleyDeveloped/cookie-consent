@@ -8,13 +8,13 @@ use Twig\TwigFunction;
 
 class CookieExtension extends AbstractExtension implements GlobalsInterface
 {
-    /**
-     * Returns the globals to add.
-     */
-    public function getGlobals(): array
-    {
-        return [
-            "dowleycookie" => CookieConsent::$cookieVariable,
-        ];
-    }
+	/**
+	 * Returns the globals to add.
+	 */
+	public function getGlobals(): array
+	{
+		return [
+			"fortycookie" => CookieConsent::$cookieVariable,
+		];
+	}
 }

@@ -2,7 +2,7 @@
 	"name": "dowleydeveloped/cookie-consent",
 	"description": "Craft CMS Plugin for managing cookies.",
 	"type": "craft-plugin",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"license": "MIT",
 	"keywords": [
 		"craftcms",
@@ -14,6 +14,12 @@
 		"craftcms-plugin",
 		"privacy",
 		"user-consent"
+	],
+	"authors": [
+		{
+			"name": "DowleyDeveloped",
+			"homepage": "https://charlottedowley.co.uk"
+		}
 	],
 	"require": {
 		"craftcms/cms": "^5.0.0"

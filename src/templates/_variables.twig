@@ -1,16 +1,16 @@
 {# Get Settings #}
-{% set settings = dowleycookie.getSettings() %}
+{% set settings = fortycookie.getSettings() %}
 
 {# Get Content #}
-{% set content = dowleycookie.getContent() %}
+{% set content = fortycookie.getContent() %}
 
 {# Get all cookies #}
-{% set requiredCookies = dowleycookie.getCookiesByType("necessary") %}
-{% set functionalCookies = dowleycookie.getCookiesByType("functionality") %}
-{% set analyticsCookies = dowleycookie.getCookiesByType("analytics") %}
-{% set performanceCookies = dowleycookie.getCookiesByType("performance") %}
-{% set advertisementCookies = dowleycookie.getCookiesByType("advertisement") %}
-{% set securityCookies = dowleycookie.getCookiesByType("security") %}
+{% set requiredCookies = fortycookie.getCookiesByType("necessary") %}
+{% set functionalCookies = fortycookie.getCookiesByType("functionality") %}
+{% set analyticsCookies = fortycookie.getCookiesByType("analytics") %}
+{% set performanceCookies = fortycookie.getCookiesByType("performance") %}
+{% set advertisementCookies = fortycookie.getCookiesByType("advertisement") %}
+{% set securityCookies = fortycookie.getCookiesByType("security") %}
 
 {# Get cookie Icon #}
 {% set cookieIcon = content.triggerIcon ?
@@ -23,10 +23,11 @@
 {% endif %}
 
 window.DowleyCookieConsent = {
-	csrf: {
-		name: '{{ craft.app.config.general.csrfTokenName|e('js') }}',
-		value: '{{ craft.app.request.csrfToken|e('js') }}',
-	},
+	actionUrl: '{{ actionUrl('dowley-cookieconsent/cookies/log-consent')|e('js') }}',
+    csrf: {
+        name: '{{ craft.app.config.general.csrfTokenName|e('js') }}',
+        value: '{{ craft.app.request.csrfToken|e('js') }}',
+    },
 	enabled: "{{ settings.isEnabled }}",
 	cookieIcon: "{{ cookieSVG }}",
 	title: "{{ content.popupTitle }}",

@@ -11,12 +11,12 @@ use craft\services\ProjectConfig;
  */
 class m250819_133731_add_cookie_content_table extends Migration
 {
-	/**
-	 * @inheritdoc
-	 */
-	public function safeUp(): bool
-	{
-		$tableName = '{{%dowley_cookies_content}}';
+    /**
+     * @inheritdoc
+     */
+    public function safeUp(): bool
+    {
+        $tableName = '{{%forty_cookies_content}}';
 
 		if (!$this->db->tableExists($tableName)) {
 
@@ -86,15 +86,15 @@ class m250819_133731_add_cookie_content_table extends Migration
 			}
 		};
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function safeDown(): bool
-	{
-		echo "m250819_133731_add_cookie_content_table cannot be reverted.\n";
-		return false;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function safeDown(): bool
+    {
+        echo "m250819_133731_add_cookie_content_table cannot be reverted.\n";
+        return false;
+    }
 }

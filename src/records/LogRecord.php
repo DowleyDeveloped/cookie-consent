@@ -14,7 +14,7 @@ class LogRecord extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%dowley_cookies_tracked}}';
+        return '{{%forty_cookies_tracked}}';
     }
 
     /**

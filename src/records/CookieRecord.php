@@ -14,7 +14,7 @@ class CookieRecord extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%dowley_cookies_enabled}}';
+        return '{{%forty_cookies_enabled}}';
     }
 
     /**
